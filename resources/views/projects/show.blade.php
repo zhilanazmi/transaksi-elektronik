@@ -85,7 +85,26 @@
                                 </div>
                             </div>
                             @if($payment->method === 'qris')
-                                <p class="mt-3 text-sm text-stone-400">QRIS: letakkan gambar di <code class="rounded bg-black/30 px-1.5 py-0.5 text-amber-200">public/images/qris.png</code></p>
+                                <div x-data="{ open: false }" class="mt-4 w-fit">
+                                    <button type="button" @click="open = true" class="group rounded-3xl border border-white/10 bg-white p-3 transition hover:-translate-y-0.5 hover:border-amber-300/60 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-stone-900">
+                                        <img src="{{ asset('images/qris.jpeg') }}" alt="Kode QRIS pembayaran" class="h-48 w-48 rounded-2xl object-contain">
+                                        <span class="mt-3 block text-center text-xs font-black uppercase tracking-[0.2em] text-stone-700 group-hover:text-amber-700">Klik untuk perbesar</span>
+                                    </button>
+
+                                    <div x-cloak x-show="open" x-transition.opacity class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" @click.self="open = false" @keydown.escape.window="open = false">
+                                        <div x-show="open" x-transition.scale.origin.center class="relative w-full max-w-xl rounded-[2rem] border border-white/10 bg-stone-950 p-4 shadow-2xl shadow-black/50 sm:p-6">
+                                            <button type="button" @click="open = false" class="absolute right-4 top-4 rounded-full bg-white/10 px-3 py-2 text-sm font-black text-white transition hover:bg-white/20" aria-label="Tutup QRIS">
+                                                X
+                                            </button>
+                                            <div class="pt-10 sm:pt-8">
+                                                <div class="rounded-3xl bg-white p-4">
+                                                    <img src="{{ asset('images/qris.jpeg') }}" alt="Kode QRIS pembayaran diperbesar" class="mx-auto max-h-[72vh] w-full object-contain">
+                                                </div>
+                                                <p class="mt-4 text-center text-sm font-semibold text-stone-300">Scan QRIS untuk menyelesaikan pembayaran.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             @endif
                         </div>
                     @empty

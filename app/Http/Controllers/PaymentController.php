@@ -33,7 +33,7 @@ class PaymentController extends Controller
             'user_id' => $request->user()->id,
             'invoice_number' => 'INV-'.now()->format('Ymd').'-'.$project->id.'-'.random_int(100, 999),
             'status' => in_array($data['method'], ['cash', 'debit', 'credit'], true) ? 'pending' : 'pending',
-            'qris_image' => $data['method'] === 'qris' ? 'images/qris.png' : null,
+            'qris_image' => $data['method'] === 'qris' ? 'images/qris.jpeg' : null,
         ]);
 
         AuditLog::create([
