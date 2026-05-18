@@ -17,10 +17,10 @@ ConstructPay adalah aplikasi web transaksi elektronik untuk jasa konstruksi. Pro
 - Role user: `admin`, `staff`, dan `customer`.
 - Customer dapat mengajukan proyek konstruksi.
 - Customer dapat melihat, mengedit, dan membatalkan pengajuan selama status masih `pending`.
-- Admin/staff dapat approve atau reject pengajuan proyek.
-- Saat proyek di-approve, sistem otomatis membuat kontrak.
+- Admin dapat approve atau reject pengajuan proyek.
+- Saat proyek di-ACC admin, sistem otomatis membuat kontrak dan status menjadi `waiting_payment`.
 - Kontrak memakai format formal dan dapat diexport ke PDF.
-- Customer dapat membuat invoice pembayaran untuk proyek approved.
+- Customer dapat membuat invoice pembayaran untuk proyek berstatus `waiting_payment` atau `approved`.
 - Metode pembayaran: cash, debit, credit, QRIS, digital wallet, dan bank transfer.
 - POS untuk admin/staff mencatat pembayaran langsung.
 - Validasi server-side untuk pengajuan proyek dan pembayaran.
@@ -140,12 +140,14 @@ customer@constructpay.test
 1. Customer login/register.
 2. Customer mengajukan proyek dari menu `Proyek`.
 3. Status awal proyek adalah `pending`.
-4. Admin/staff membuka menu `Approval`.
-5. Admin/staff approve atau reject proyek.
-6. Jika approved, kontrak otomatis dibuat.
-7. Customer membuka detail proyek dan dapat membuat pembayaran.
-8. Jika kontrak tersedia, customer/admin/staff dapat download kontrak PDF.
-9. Admin/staff dapat mencatat pembayaran langsung melalui menu `POS`.
+4. Admin membuka menu `Approval`.
+5. Admin melakukan ACC atau reject proyek.
+6. Jika di-ACC, kontrak otomatis dibuat dan status proyek menjadi `waiting_payment`.
+7. Customer membuka detail proyek dan membuat pembayaran.
+8. Admin/staff mencatat atau mengonfirmasi pembayaran.
+9. Setelah pembayaran tercatat lunas, status proyek menjadi `approved`.
+10. Jika kontrak tersedia, customer/admin/staff dapat download kontrak PDF.
+11. Staff dapat mencatat pembayaran langsung melalui menu `POS`.
 
 ## Struktur Folder Penting
 
@@ -213,6 +215,7 @@ projects
 contracts
 payments
 pos_transactions
+audit_logs
 ```
 
 Kolom tambahan pada `users`:
@@ -230,25 +233,30 @@ Customer:
 - Membuat pengajuan proyek.
 - Melihat proyek miliknya sendiri.
 - Mengedit/menghapus proyek selama masih `pending`.
-- Membuat pembayaran jika proyek sudah `approved`.
+- Membuat pembayaran jika proyek sudah `waiting_payment` atau `approved`.
 - Download kontrak PDF miliknya.
 
 Admin:
 
 - Melihat semua proyek.
 - Approve/reject proyek.
+- Mengubah proyek dari `pending` menjadi `waiting_payment` lewat ACC.
+- Mengelola keputusan utama proyek dan validasi pengajuan.
 - Mengakses POS.
 - Menandai pembayaran lunas.
 - Download semua kontrak PDF.
 
 Staff:
 
-- Akses approval dan POS seperti admin untuk kebutuhan demo.
+- Fokus ke operasional pembayaran/POS.
+- Mencatat transaksi pembayaran langsung.
+- Menandai pembayaran lunas jika pembayaran sudah diterima.
+- Staff tidak bisa melakukan ACC/reject proyek.
 - Download kontrak PDF.
 
 ## Kontrak PDF
 
-Kontrak formal dibuat saat proyek di-approve.
+Kontrak formal dibuat saat proyek di-ACC admin dan status proyek menjadi `waiting_payment`.
 
 Template PDF ada di:
 
@@ -285,10 +293,10 @@ Jika ingin memakai QRIS asli, letakkan gambar QRIS di path tersebut. Jika folder
 - Budget proyek minimal `1000000`.
 - Deskripsi proyek minimal 20 karakter.
 - Tanggal mulai tidak boleh sebelum hari ini.
-- Payment hanya bisa dibuat untuk proyek approved.
+- Payment hanya bisa dibuat untuk proyek `waiting_payment` atau `approved`.
 - Nominal pembayaran minimal `10000`.
 - Nominal pembayaran tidak boleh melebihi sisa tagihan.
-- POS hanya bisa mencatat pembayaran untuk proyek approved.
+- POS hanya bisa mencatat pembayaran untuk proyek `waiting_payment` atau `approved`.
 - Customer tidak bisa mengakses proyek milik user lain.
 - Export PDF dibatasi berdasarkan role dan kepemilikan proyek.
 

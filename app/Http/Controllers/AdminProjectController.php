@@ -11,7 +11,7 @@ class AdminProjectController extends Controller
 {
     public function index()
     {
-        $this->authorizeAdminOrStaff();
+        $this->authorizeAdmin();
 
         $projects = Project::with(['customer', 'contract'])
             ->latest()
@@ -22,14 +22,14 @@ class AdminProjectController extends Controller
 
     public function approve(Request $request, Project $project)
     {
-        $this->authorizeAdminOrStaff();
+        $this->authorizeAdmin();
 
         $data = $request->validate([
             'admin_notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
         $project->update([
-            'status' => 'approved',
+            'status' => 'waiting_payment',
             'approved_by' => $request->user()->id,
             'approved_at' => now(),
             'admin_notes' => $data['admin_notes'] ?? null,
@@ -44,17 +44,17 @@ class AdminProjectController extends Controller
 
         AuditLog::create([
             'user_id' => $request->user()->id,
-            'action' => 'project_approved',
+            'action' => 'project_waiting_payment',
             'subject_type' => Project::class,
             'subject_id' => $project->id,
         ]);
 
-        return back()->with('status', 'Proyek disetujui dan kontrak dibuat otomatis.');
+        return back()->with('status', 'Proyek di-ACC, kontrak dibuat, dan status menunggu pembayaran.');
     }
 
     public function reject(Request $request, Project $project)
     {
-        $this->authorizeAdminOrStaff();
+        $this->authorizeAdmin();
 
         $data = $request->validate([
             'admin_notes' => ['required', 'string', 'max:1000'],
@@ -77,9 +77,9 @@ class AdminProjectController extends Controller
         return back()->with('status', 'Proyek ditolak.');
     }
 
-    private function authorizeAdminOrStaff(): void
+    private function authorizeAdmin(): void
     {
-        abort_unless(request()->user()->isAdmin() || request()->user()->isStaff(), 403);
+        abort_unless(request()->user()->isAdmin(), 403);
     }
 
     private function contractContent(Project $project): string

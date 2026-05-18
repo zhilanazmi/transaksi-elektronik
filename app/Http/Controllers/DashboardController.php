@@ -20,6 +20,7 @@ class DashboardController extends Controller
             'projects' => $projects->take(6)->get(),
             'totalProjects' => (clone $projects)->count(),
             'pendingProjects' => Project::when($user->role === 'customer', fn ($query) => $query->where('user_id', $user->id))->where('status', 'pending')->count(),
+            'waitingPaymentProjects' => Project::when($user->role === 'customer', fn ($query) => $query->where('user_id', $user->id))->where('status', 'waiting_payment')->count(),
             'approvedProjects' => Project::when($user->role === 'customer', fn ($query) => $query->where('user_id', $user->id))->where('status', 'approved')->count(),
             'paidRevenue' => Payment::when($user->role === 'customer', fn ($query) => $query->where('user_id', $user->id))->where('status', 'paid')->sum('amount'),
         ]);

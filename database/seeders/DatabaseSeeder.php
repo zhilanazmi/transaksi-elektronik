@@ -54,7 +54,7 @@ class DatabaseSeeder extends Seeder
             'budget' => 185000000,
             'start_date' => now()->addWeeks(2)->toDateString(),
             'description' => 'Renovasi fasad, struktur ringan, instalasi listrik, dan finishing interior ruko.',
-            'status' => 'approved',
+            'status' => 'waiting_payment',
             'approved_at' => now(),
             'admin_notes' => 'Dokumen awal lengkap dan estimasi biaya disetujui.',
         ]);

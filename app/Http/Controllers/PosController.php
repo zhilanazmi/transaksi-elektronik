@@ -14,7 +14,7 @@ class PosController extends Controller
         $this->authorizeAdminOrStaff();
 
         return view('pos.index', [
-            'projects' => Project::with('customer')->where('status', 'approved')->latest()->get(),
+            'projects' => Project::with('customer')->whereIn('status', ['waiting_payment', 'approved'])->latest()->get(),
             'payments' => Payment::with(['project.customer', 'posTransaction'])->latest()->take(15)->get(),
         ]);
     }
@@ -32,7 +32,7 @@ class PosController extends Controller
         ]);
 
         $project = Project::with('customer')->findOrFail($data['project_id']);
-        abort_unless($project->status === 'approved', 422, 'Proyek belum disetujui.');
+        abort_unless(in_array($project->status, ['waiting_payment', 'approved'], true), 422, 'Proyek belum di-ACC admin.');
         abort_if($data['amount'] > $project->remainingAmount(), 422, 'Nominal melebihi sisa tagihan.');
 
         $payment = Payment::create([
@@ -53,6 +53,10 @@ class PosController extends Controller
             'change_amount' => $data['received_amount'] - $data['amount'],
             'terminal_name' => 'Main Counter',
         ]);
+
+        if ($project->status === 'waiting_payment') {
+            $project->update(['status' => 'approved']);
+        }
 
         return redirect()->route('pos.index')->with('status', 'Transaksi POS berhasil dicatat.');
     }

@@ -13,6 +13,6 @@
 </div>
 <div>
     <x-input-label for="description" value="Deskripsi Kebutuhan" />
-    <textarea id="description" name="description" rows="5" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">{{ old('description', $project->description ?? '') }}</textarea>
+    <textarea id="description" name="description" rows="5" class="mt-1 block w-full rounded-2xl border-white/10 bg-stone-950 text-stone-100 shadow-sm focus:border-amber-500 focus:ring-amber-500">{{ old('description', $project->description ?? '') }}</textarea>
     <x-input-error :messages="$errors->get('description')" class="mt-2" />
 </div>

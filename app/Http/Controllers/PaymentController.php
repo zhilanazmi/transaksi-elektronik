@@ -11,14 +11,14 @@ class PaymentController extends Controller
 {
     public function create(Project $project)
     {
-        abort_if($project->user_id !== request()->user()->id || $project->status !== 'approved', 403);
+        abort_if($project->user_id !== request()->user()->id || ! in_array($project->status, ['waiting_payment', 'approved'], true), 403);
 
         return view('payments.create', compact('project'));
     }
 
     public function store(Request $request, Project $project)
     {
-        abort_if($project->user_id !== $request->user()->id || $project->status !== 'approved', 403);
+        abort_if($project->user_id !== $request->user()->id || ! in_array($project->status, ['waiting_payment', 'approved'], true), 403);
 
         $remaining = $project->remainingAmount();
         $data = $request->validate([
@@ -54,6 +54,10 @@ class PaymentController extends Controller
             'status' => 'paid',
             'paid_at' => now(),
         ]);
+
+        if ($payment->project->status === 'waiting_payment') {
+            $payment->project->update(['status' => 'approved']);
+        }
 
         return back()->with('status', 'Pembayaran ditandai lunas.');
     }
