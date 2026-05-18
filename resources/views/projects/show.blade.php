@@ -14,8 +14,13 @@
             </dl>
             @if($project->contract)
                 <div class="mt-6 rounded-2xl border border-amber-300/40 bg-amber-50 p-5 dark:bg-amber-900/10">
-                    <p class="text-sm font-bold text-amber-700 dark:text-amber-300">Kontrak {{ $project->contract->contract_number }}</p>
-                    <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">{{ $project->contract->content }}</p>
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                            <p class="text-sm font-bold text-amber-700 dark:text-amber-300">Kontrak {{ $project->contract->contract_number }}</p>
+                            <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">Kontrak formal sudah tersedia dan dapat diekspor sebagai PDF.</p>
+                        </div>
+                        <a href="{{ route('contracts.download', $project->contract) }}" class="rounded-xl bg-gray-950 px-4 py-2 text-center text-sm font-black text-white dark:bg-amber-500 dark:text-gray-950">Download PDF</a>
+                    </div>
                 </div>
             @endif
         </section>

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminProjectController;
+use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PosController;
@@ -19,6 +20,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/projects/{project}/payments/create', [PaymentController::class, 'create'])->name('payments.create');
     Route::post('/projects/{project}/payments', [PaymentController::class, 'store'])->name('payments.store');
     Route::patch('/payments/{payment}/paid', [PaymentController::class, 'markPaid'])->name('payments.paid');
+    Route::get('/contracts/{contract}/download', [ContractController::class, 'download'])->name('contracts.download');
     Route::get('/admin/projects', [AdminProjectController::class, 'index'])->name('admin.projects.index');
     Route::patch('/admin/projects/{project}/approve', [AdminProjectController::class, 'approve'])->name('admin.projects.approve');
     Route::patch('/admin/projects/{project}/reject', [AdminProjectController::class, 'reject'])->name('admin.projects.reject');
