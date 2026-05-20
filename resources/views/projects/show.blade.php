@@ -72,6 +72,11 @@
                                 <div>
                                     <p class="font-black text-white">{{ $payment->invoice_number }}</p>
                                     <p class="mt-1 text-sm uppercase text-stone-400">{{ $payment->method }} - {{ $payment->status }}</p>
+                                    @if($payment->method === 'midtrans' && $payment->status === 'pending' && $payment->snap_redirect_url && $project->user_id === auth()->id())
+                                        <a href="{{ $payment->snap_redirect_url }}" class="mt-3 inline-flex rounded-xl bg-amber-500 px-3 py-2 text-xs font-black text-stone-950">
+                                            Lanjutkan Pembayaran
+                                        </a>
+                                    @endif
                                 </div>
                                 <div class="text-left sm:text-right">
                                     <p class="font-black text-white">Rp{{ number_format($payment->amount, 0, ',', '.') }}</p>

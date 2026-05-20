@@ -60,7 +60,7 @@
                         <div class="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 p-4 shadow-2xl shadow-black/30 sm:p-6">
                             <div class="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent"></div>
                             <div class="relative flex aspect-[4/3] items-center justify-center rounded-[1.5rem] bg-stone-900/80 p-6">
-                                <img src="{{ asset('images/construction-hero.png') }}" alt="Ilustrasi proyek konstruksi" class="h-full w-full object-contain drop-shadow-2xl" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <img src="{{ asset('images/ijatawakal.jfif') }}" alt="Ilustrasi proyek konstruksi" class="h-full w-full object-contain drop-shadow-2xl" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                 <div class="hidden h-full w-full items-center justify-center rounded-2xl border border-dashed border-amber-300/40 bg-amber-300/5 text-center text-sm font-bold leading-6 text-amber-100">
                                     Letakkan file PNG di<br>public/images/construction-hero.png
                                 </div>

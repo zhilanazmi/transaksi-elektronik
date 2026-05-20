@@ -28,6 +28,7 @@
                 <div>
                     <x-input-label for="method" value="Metode Pembayaran" />
                     <select name="method" id="method" class="mt-2 block w-full rounded-2xl border-white/10 bg-stone-950 text-stone-200 focus:border-amber-500 focus:ring-amber-500">
+                        <option value="midtrans">Midtrans Sandbox</option>
                         <option value="qris">QRIS</option>
                         <option value="cash">Cash</option>
                         <option value="debit">Debit</option>

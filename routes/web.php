@@ -14,6 +14,8 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verified'])->name('dashboard');
+Route::post('/midtrans/notification', [PaymentController::class, 'notification'])
+    ->name('midtrans.notification');
 
 Route::middleware('auth')->group(function () {
     Route::resource('projects', ProjectController::class);

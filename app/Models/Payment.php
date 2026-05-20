@@ -20,6 +20,13 @@ class Payment extends Model
         'qris_image',
         'paid_at',
         'notes',
+        'midtrans_order_id',
+        'midtrans_transaction_id',
+        'midtrans_payment_type',
+        'midtrans_transaction_status',
+        'midtrans_fraud_status',
+        'snap_token',
+        'snap_redirect_url',
     ];
 
     protected function casts(): array
