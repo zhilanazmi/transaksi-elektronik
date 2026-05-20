@@ -16,7 +16,7 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
                     <x-nav-link :href="route('projects.index')" :active="request()->routeIs('projects.*')">
-                        Proyek
+                        Pesanan
                     </x-nav-link>
                     @if(Auth::user()->isAdmin())
                         <x-nav-link :href="route('admin.projects.index')" :active="request()->routeIs('admin.projects.*')">
@@ -85,7 +85,7 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('projects.index')" :active="request()->routeIs('projects.*')">
-                Proyek
+                Pesanan
             </x-responsive-nav-link>
             @if(Auth::user()->isAdmin())
                 <x-responsive-nav-link :href="route('admin.projects.index')" :active="request()->routeIs('admin.projects.*')">

@@ -2,8 +2,8 @@
     <x-slot name="header">
         <div>
             <p class="text-sm font-black uppercase tracking-[0.3em] text-amber-400">Admin</p>
-            <h2 class="mt-1 text-2xl font-black text-white sm:text-3xl">Approval Proyek</h2>
-            <p class="mt-1 text-sm text-stone-400">Validasi pengajuan customer dan buat kontrak proyek.</p>
+            <h2 class="mt-1 text-2xl font-black text-white sm:text-3xl">Approval Pesanan</h2>
+            <p class="mt-1 text-sm text-stone-400">Validasi pengajuan customer. Kontrak dibuat otomatis setelah pembayaran lunas.</p>
         </div>
     </x-slot>
 
@@ -22,6 +22,7 @@
                                 <h3 class="mt-2 text-xl font-black text-white">{{ $project->title }}</h3>
                                 <p class="mt-3 text-sm leading-6 text-stone-400">{{ $project->description }}</p>
                                 <div class="mt-4 flex flex-wrap gap-3">
+                                    <span class="rounded-full bg-white/[0.06] px-3 py-1 text-sm font-bold text-white">{{ number_format((float) ($project->laundry_weight ?? 0), 1, ',', '.') }} kg</span>
                                     <span class="rounded-full bg-white/[0.06] px-3 py-1 text-sm font-bold text-white">Rp{{ number_format($project->budget, 0, ',', '.') }}</span>
                                     <span class="rounded-full px-3 py-1 text-sm font-black capitalize {{ $project->status === 'approved' ? 'bg-emerald-400/15 text-emerald-300' : ($project->status === 'waiting_payment' ? 'bg-sky-400/15 text-sky-300' : ($project->status === 'rejected' ? 'bg-red-400/15 text-red-300' : 'bg-amber-400/15 text-amber-300')) }}">{{ str_replace('_', ' ', $project->status) }}</span>
                                 </div>
@@ -33,7 +34,7 @@
                                         @csrf
                                         @method('PATCH')
                                         <input name="admin_notes" class="w-full rounded-2xl border-white/10 bg-stone-950 text-white focus:border-emerald-500 focus:ring-emerald-500" placeholder="Catatan approval">
-                                        <button class="w-full rounded-2xl bg-emerald-500 px-4 py-3 font-black text-white transition hover:bg-emerald-400">ACC + Buat Kontrak</button>
+                                        <button class="w-full rounded-2xl bg-emerald-500 px-4 py-3 font-black text-white transition hover:bg-emerald-400">ACC Pesanan</button>
                                     </form>
                                     <form method="POST" action="{{ route('admin.projects.reject', $project) }}" class="space-y-2 rounded-3xl border border-red-400/20 bg-red-400/5 p-4">
                                         @csrf
@@ -48,7 +49,7 @@
                         </div>
                     </article>
                 @empty
-                    <div class="rounded-[2rem] border border-dashed border-white/20 p-10 text-center text-stone-400">Belum ada proyek untuk ditinjau.</div>
+                    <div class="rounded-[2rem] border border-dashed border-white/20 p-10 text-center text-stone-400">Belum ada pesanan untuk ditinjau.</div>
                 @endforelse
             </div>
 

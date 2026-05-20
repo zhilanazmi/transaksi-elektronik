@@ -16,6 +16,8 @@ class Project extends Model
         'title',
         'construction_type',
         'location',
+        'laundry_weight',
+        'service_price',
         'budget',
         'start_date',
         'description',
@@ -28,6 +30,8 @@ class Project extends Model
     {
         return [
             'budget' => 'decimal:2',
+            'laundry_weight' => 'decimal:2',
+            'service_price' => 'integer',
             'start_date' => 'date',
             'approved_at' => 'datetime',
         ];

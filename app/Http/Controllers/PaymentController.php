@@ -7,11 +7,17 @@ use App\Models\Payment;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Midtrans\Transaction;
 use Midtrans\Snap;
 use Midtrans\Config;
 
 class PaymentController extends Controller
 {
+    public static function syncProjectMidtransPayments(Project $project): void
+    {
+        (new self())->syncPendingMidtransPayments($project);
+    }
+
     private function configureMidtrans(): void
     {
         Config::$serverKey = config('services.midtrans.server_key');
@@ -23,26 +29,35 @@ class PaymentController extends Controller
     {
         abort_if($project->user_id !== request()->user()->id || ! in_array($project->status, ['waiting_payment', 'approved'], true), 403);
 
+        $this->syncPendingMidtransPayments($project);
+        $project->refresh();
+
         return view('payments.create', compact('project'));
     }
 
     public function store(Request $request, Project $project)
     {
         abort_if($project->user_id !== $request->user()->id || ! in_array($project->status, ['waiting_payment', 'approved'], true), 403);
+        $this->syncPendingMidtransPayments($project);
+        $project->refresh();
         $remaining = $project->remainingAmount();
+        abort_if($remaining <= 0, 422, 'Tagihan pesanan sudah lunas.');
         $data = $request->validate([
             'method' => ['required', 'in:midtrans,cash,debit,credit,qris,digital,bank_transfer'],
-            'amount' => ['required', 'numeric', 'min:10000', 'max:'.$remaining],
             'reference' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ]);
         if ($data['method'] !== 'midtrans') {
-            $payment = Payment::create($data + [
+            $payment = Payment::create([
                 'project_id' => $project->id,
                 'user_id' => $request->user()->id,
                 'invoice_number' => 'INV-'.now()->format('Ymd').'-'.$project->id.'-'.random_int(100, 999),
+                'method' => $data['method'],
+                'amount' => $remaining,
                 'status' => 'pending',
+                'reference' => $data['reference'] ?? null,
                 'qris_image' => $data['method'] === 'qris' ? 'images/qris.jpeg' : null,
+                'notes' => $data['notes'] ?? null,
             ]);
             AuditLog::create([
                 'user_id' => $request->user()->id,
@@ -53,7 +68,7 @@ class PaymentController extends Controller
             return redirect()->route('projects.show', $project)->with('status', 'Invoice pembayaran berhasil dibuat.');
         }
         $this->configureMidtrans();
-        $payment = DB::transaction(function () use ($data, $project, $request) {
+        $payment = DB::transaction(function () use ($data, $project, $request, $remaining) {
             $invoiceNumber = 'INV-'.now()->format('Ymd').'-'.$project->id.'-'.random_int(100, 999);
             $orderId = $invoiceNumber.'-MIDTRANS';
             $payment = Payment::create([
@@ -62,7 +77,7 @@ class PaymentController extends Controller
                 'invoice_number' => $invoiceNumber,
                 'midtrans_order_id' => $orderId,
                 'method' => 'midtrans',
-                'amount' => $data['amount'],
+                'amount' => $remaining,
                 'status' => 'pending',
                 'reference' => $data['reference'] ?? null,
                 'notes' => $data['notes'] ?? null,
@@ -70,7 +85,7 @@ class PaymentController extends Controller
             $params = [
                 'transaction_details' => [
                     'order_id' => $orderId,
-                    'gross_amount' => (int) $data['amount'],
+                    'gross_amount' => (int) $remaining,
                 ],
                 'customer_details' => [
                     'first_name' => $request->user()->name,
@@ -79,7 +94,7 @@ class PaymentController extends Controller
                 'item_details' => [
                     [
                         'id' => $project->project_code,
-                        'price' => (int) $data['amount'],
+                        'price' => (int) $remaining,
                         'quantity' => 1,
                         'name' => 'Pembayaran '.$project->title,
                     ],
@@ -101,7 +116,7 @@ class PaymentController extends Controller
             ]);
             return $payment;
         });
-    return redirect($payment->snap_redirect_url);
+        return redirect($payment->snap_redirect_url);
     }
 
     public function markPaid(Payment $payment)
@@ -116,6 +131,8 @@ class PaymentController extends Controller
         if ($payment->project->status === 'waiting_payment') {
             $payment->project->update(['status' => 'approved']);
         }
+
+        $this->createContractAfterPayment($payment->project->fresh(['customer']));
 
         return back()->with('status', 'Pembayaran ditandai lunas.');
     }
@@ -132,8 +149,42 @@ class PaymentController extends Controller
             abort(403, 'Invalid signature.');
         }
         $payment = Payment::where('midtrans_order_id', $orderId)->firstOrFail();
-        $transactionStatus = $request->input('transaction_status');
-        $fraudStatus = $request->input('fraud_status');
+        $this->applyMidtransStatus($payment, $request->all());
+
+        return response()->json([
+            'message' => 'Notification processed.',
+        ]);
+    }
+
+    private function syncPendingMidtransPayments(Project $project): void
+    {
+        $pendingPayments = $project->payments()
+            ->where('method', 'midtrans')
+            ->where('status', 'pending')
+            ->whereNotNull('midtrans_order_id')
+            ->get();
+
+        if ($pendingPayments->isEmpty()) {
+            return;
+        }
+
+        $this->configureMidtrans();
+
+        foreach ($pendingPayments as $payment) {
+            try {
+                $payload = (array) Transaction::status($payment->midtrans_order_id);
+            } catch (\Throwable) {
+                continue;
+            }
+
+            $this->applyMidtransStatus($payment, $payload);
+        }
+    }
+
+    private function applyMidtransStatus(Payment $payment, array $payload): void
+    {
+        $transactionStatus = $payload['transaction_status'] ?? null;
+        $fraudStatus = $payload['fraud_status'] ?? null;
         $status = match ($transactionStatus) {
             'capture' => $fraudStatus === 'challenge' ? 'pending' : 'paid',
             'settlement' => 'paid',
@@ -141,19 +192,37 @@ class PaymentController extends Controller
             'deny', 'cancel', 'expire' => 'failed',
             default => $payment->status,
         };
+
         $payment->update([
             'status' => $status,
-            'paid_at' => $status === 'paid' ? now() : $payment->paid_at,
-            'midtrans_transaction_id' => $request->input('transaction_id'),
-            'midtrans_payment_type' => $request->input('payment_type'),
-            'midtrans_transaction_status' => $transactionStatus,
-            'midtrans_fraud_status' => $fraudStatus,
+            'paid_at' => $status === 'paid' ? ($payment->paid_at ?? now()) : $payment->paid_at,
+            'midtrans_transaction_id' => $payload['transaction_id'] ?? $payment->midtrans_transaction_id,
+            'midtrans_payment_type' => $payload['payment_type'] ?? $payment->midtrans_payment_type,
+            'midtrans_transaction_status' => $transactionStatus ?? $payment->midtrans_transaction_status,
+            'midtrans_fraud_status' => $fraudStatus ?? $payment->midtrans_fraud_status,
         ]);
+
         if ($status === 'paid' && $payment->project->status === 'waiting_payment') {
             $payment->project->update(['status' => 'approved']);
         }
-        return response()->json([
-            'message' => 'Notification processed.',
+
+        if ($status === 'paid') {
+            $this->createContractAfterPayment($payment->project->fresh(['customer']));
+        }
+    }
+
+    private function createContractAfterPayment(Project $project): void
+    {
+        $project->contract()->firstOrCreate([], [
+            'contract_number' => 'CTR-'.now()->format('Ymd').'-'.$project->id,
+            'issued_at' => now()->toDateString(),
+            'contract_value' => $project->budget,
+            'content' => $this->contractContent($project),
         ]);
+    }
+
+    private function contractContent(Project $project): string
+    {
+        return "Kontrak layanan laundry antara LaundryPay dan {$project->customer->name} untuk pesanan {$project->title} dengan berat ".number_format((float) $project->laundry_weight, 1, ',', '.')." kg dan alamat pickup/antar {$project->location}. Nilai layanan Rp".number_format((float) $project->budget, 0, ',', '.').". Pembayaran telah tercatat lunas melalui sistem. Layanan mengikuti detail cucian dan validasi admin.";
     }
 }

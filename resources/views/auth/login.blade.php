@@ -2,7 +2,7 @@
     <div class="mb-6">
         <p class="text-sm font-black uppercase tracking-[0.25em] text-amber-600">Masuk Sistem</p>
         <h1 class="mt-2 text-3xl font-black text-stone-950 dark:text-white">Selamat datang kembali</h1>
-        <p class="mt-2 text-sm text-stone-500 dark:text-stone-400">Gunakan akun admin, staff, atau customer untuk melanjutkan transaksi proyek.</p>
+        <p class="mt-2 text-sm text-stone-500 dark:text-stone-400">Gunakan akun admin, staff, atau customer untuk melanjutkan transaksi laundry.</p>
     </div>
 
     <x-auth-session-status class="mb-4" :status="session('status')" />

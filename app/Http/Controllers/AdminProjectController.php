@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
-use App\Models\Contract;
 use App\Models\Project;
 use Illuminate\Http\Request;
 
@@ -35,13 +34,6 @@ class AdminProjectController extends Controller
             'admin_notes' => $data['admin_notes'] ?? null,
         ]);
 
-        $project->contract()->firstOrCreate([], [
-            'contract_number' => 'CTR-'.now()->format('Ymd').'-'.$project->id,
-            'issued_at' => now()->toDateString(),
-            'contract_value' => $project->budget,
-            'content' => $this->contractContent($project->fresh(['customer'])),
-        ]);
-
         AuditLog::create([
             'user_id' => $request->user()->id,
             'action' => 'project_waiting_payment',
@@ -49,7 +41,7 @@ class AdminProjectController extends Controller
             'subject_id' => $project->id,
         ]);
 
-        return back()->with('status', 'Proyek di-ACC, kontrak dibuat, dan status menunggu pembayaran.');
+        return back()->with('status', 'Pesanan laundry di-ACC dan status menunggu pembayaran. Kontrak dibuat setelah pembayaran lunas.');
     }
 
     public function reject(Request $request, Project $project)
@@ -74,16 +66,11 @@ class AdminProjectController extends Controller
             'subject_id' => $project->id,
         ]);
 
-        return back()->with('status', 'Proyek ditolak.');
+        return back()->with('status', 'Pesanan laundry ditolak.');
     }
 
     private function authorizeAdmin(): void
     {
         abort_unless(request()->user()->isAdmin(), 403);
-    }
-
-    private function contractContent(Project $project): string
-    {
-        return "Kontrak pekerjaan konstruksi antara ConstructPay dan {$project->customer->name} untuk proyek {$project->title} di {$project->location}. Nilai kontrak Rp".number_format((float) $project->budget, 0, ',', '.').". Pembayaran dapat dilakukan melalui cash, debit, kredit, QRIS, atau transfer digital. Pelaksanaan mengikuti spesifikasi pekerjaan dan validasi admin.";
     }
 }

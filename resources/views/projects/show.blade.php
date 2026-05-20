@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <p class="text-sm font-black uppercase tracking-[0.3em] text-amber-400">Detail Proyek</p>
+            <p class="text-sm font-black uppercase tracking-[0.3em] text-amber-400">Detail Pesanan</p>
             <h2 class="mt-1 text-2xl font-black text-white sm:text-3xl">{{ $project->title }}</h2>
         </div>
     </x-slot>
@@ -19,9 +19,11 @@
 
                 <dl class="mt-8 grid gap-4 sm:grid-cols-2">
                     @foreach([
-                        ['Jenis', $project->construction_type],
-                        ['Lokasi', $project->location],
-                        ['Budget', 'Rp'.number_format($project->budget, 0, ',', '.')],
+                        ['Jenis Layanan', $project->construction_type],
+                        ['Berat Cucian', number_format((float) ($project->laundry_weight ?? 0), 1, ',', '.').' kg'],
+                        ['Alamat Pickup/Antar', $project->location],
+                        ['Harga Layanan', 'Rp'.number_format((int) ($project->service_price ?? 0), 0, ',', '.').'/kg'],
+                        ['Total Tagihan', 'Rp'.number_format($project->budget, 0, ',', '.')],
                         ['Sisa Tagihan', 'Rp'.number_format($project->remainingAmount(), 0, ',', '.')],
                     ] as $item)
                         <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
@@ -36,7 +38,7 @@
                         <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                             <div>
                                 <p class="text-sm font-black text-amber-200">Kontrak {{ $project->contract->contract_number }}</p>
-                                <p class="mt-2 text-sm leading-6 text-stone-300">Kontrak formal sudah tersedia dan dapat diekspor sebagai PDF.</p>
+                                <p class="mt-2 text-sm leading-6 text-stone-300">Kontrak layanan laundry sudah tersedia dan dapat diekspor sebagai PDF.</p>
                             </div>
                             <a href="{{ route('contracts.download', $project->contract) }}" class="rounded-2xl bg-amber-500 px-4 py-3 text-center text-sm font-black text-stone-950 transition hover:bg-amber-400">Download PDF</a>
                         </div>

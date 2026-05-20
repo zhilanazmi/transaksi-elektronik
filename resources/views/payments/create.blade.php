@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div>
             <p class="text-sm font-black uppercase tracking-[0.3em] text-amber-400">Invoice</p>
-            <h2 class="mt-1 text-2xl font-black text-white sm:text-3xl">Pembayaran Proyek</h2>
+            <h2 class="mt-1 text-2xl font-black text-white sm:text-3xl">Pembayaran Pesanan Laundry</h2>
         </div>
     </x-slot>
 
@@ -39,10 +39,10 @@
                     <x-input-error :messages="$errors->get('method')" class="mt-2" />
                 </div>
 
-                <div>
-                    <x-input-label for="amount" value="Nominal" />
-                    <x-text-input id="amount" name="amount" type="number" class="mt-2 block w-full" max="{{ $project->remainingAmount() }}" min="10000" required />
-                    <x-input-error :messages="$errors->get('amount')" class="mt-2" />
+                <div class="rounded-3xl border border-white/10 bg-white/[0.04] p-5">
+                    <p class="text-sm font-semibold text-stone-400">Nominal pembayaran</p>
+                    <p class="mt-2 text-3xl font-black text-white">Rp{{ number_format($project->remainingAmount(), 0, ',', '.') }}</p>
+                    <p class="mt-2 text-sm text-stone-400">Nominal otomatis mengikuti sisa tagihan pesanan laundry.</p>
                 </div>
 
                 <div>

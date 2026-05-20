@@ -9,6 +9,14 @@ use Illuminate\Support\Str;
 
 class ProjectController extends Controller
 {
+    private const SERVICE_PRICES = [
+        'Cuci kering' => 6000,
+        'Cuci kering setrika' => 8000,
+        'Setrika saja' => 5000,
+        'Express cuci kering setrika' => 12000,
+        'Bed cover' => 25000,
+    ];
+
     public function index()
     {
         $projects = Project::with(['contract', 'payments'])
@@ -21,19 +29,24 @@ class ProjectController extends Controller
 
     public function create()
     {
-        return view('projects.create');
+        return view('projects.create', [
+            'servicePrices' => self::SERVICE_PRICES,
+        ]);
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'construction_type' => ['required', 'string', 'max:255'],
+            'construction_type' => ['required', 'string', 'max:255', 'in:'.implode(',', array_keys(self::SERVICE_PRICES))],
             'location' => ['required', 'string', 'max:255'],
-            'budget' => ['required', 'numeric', 'min:1000000'],
+            'laundry_weight' => ['required', 'numeric', 'min:1', 'max:100'],
             'start_date' => ['nullable', 'date', 'after_or_equal:today'],
             'description' => ['required', 'string', 'min:20'],
         ]);
+
+        $data['service_price'] = self::SERVICE_PRICES[$data['construction_type']];
+        $data['budget'] = $this->calculateLaundryTotal((float) $data['laundry_weight'], $data['service_price']);
 
         $project = Project::create($data + [
             'user_id' => $request->user()->id,
@@ -48,13 +61,14 @@ class ProjectController extends Controller
             'subject_id' => $project->id,
         ]);
 
-        return redirect()->route('projects.show', $project)->with('status', 'Pengajuan proyek berhasil dikirim.');
+        return redirect()->route('projects.show', $project)->with('status', 'Pengajuan pesanan laundry berhasil dikirim.');
     }
 
     public function show(Project $project)
     {
         abort_if($project->user_id !== request()->user()->id && ! request()->user()->isAdmin() && ! request()->user()->isStaff(), 403);
 
+        PaymentController::syncProjectMidtransPayments($project);
         $project->load(['customer', 'approver', 'contract', 'payments.posTransaction']);
 
         return view('projects.show', compact('project'));
@@ -64,23 +78,31 @@ class ProjectController extends Controller
     {
         abort_if($project->user_id !== request()->user()->id || $project->status !== 'pending', 403);
 
-        return view('projects.edit', compact('project'));
+        return view('projects.edit', [
+            'project' => $project,
+            'servicePrices' => self::SERVICE_PRICES,
+        ]);
     }
 
     public function update(Request $request, Project $project)
     {
         abort_if($project->user_id !== $request->user()->id || $project->status !== 'pending', 403);
 
-        $project->update($request->validate([
+        $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'construction_type' => ['required', 'string', 'max:255'],
+            'construction_type' => ['required', 'string', 'max:255', 'in:'.implode(',', array_keys(self::SERVICE_PRICES))],
             'location' => ['required', 'string', 'max:255'],
-            'budget' => ['required', 'numeric', 'min:1000000'],
+            'laundry_weight' => ['required', 'numeric', 'min:1', 'max:100'],
             'start_date' => ['nullable', 'date', 'after_or_equal:today'],
             'description' => ['required', 'string', 'min:20'],
-        ]));
+        ]);
 
-        return redirect()->route('projects.show', $project)->with('status', 'Pengajuan proyek diperbarui.');
+        $data['service_price'] = self::SERVICE_PRICES[$data['construction_type']];
+        $data['budget'] = $this->calculateLaundryTotal((float) $data['laundry_weight'], $data['service_price']);
+
+        $project->update($data);
+
+        return redirect()->route('projects.show', $project)->with('status', 'Pengajuan pesanan laundry diperbarui.');
     }
 
     public function destroy(Project $project)
@@ -89,6 +111,11 @@ class ProjectController extends Controller
 
         $project->delete();
 
-        return redirect()->route('projects.index')->with('status', 'Pengajuan proyek dibatalkan.');
+        return redirect()->route('projects.index')->with('status', 'Pengajuan pesanan laundry dibatalkan.');
+    }
+
+    private function calculateLaundryTotal(float $weight, int $price): int
+    {
+        return (int) ceil($weight * $price);
     }
 }

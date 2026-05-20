@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>{{ config('app.name', 'ConstructPay') }}</title>
+        <title>{{ config('app.name', 'LaundryPay') }}</title>
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800,900&display=swap" rel="stylesheet" />
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -18,9 +18,9 @@
                     <a href="/" class="inline-flex"><x-application-logo /></a>
                 </div>
                 <div class="relative z-10 max-w-xl">
-                    <p class="mb-4 inline-flex rounded-full border border-amber-300/20 bg-amber-300/10 px-4 py-2 text-sm font-bold text-amber-200">Portal proyek konstruksi</p>
-                    <h1 class="text-5xl font-black leading-tight tracking-tight">Kelola proyek, kontrak, dan pembayaran dengan aman.</h1>
-                    <p class="mt-5 text-lg leading-8 text-stone-300">Login untuk mengajukan proyek, mengelola approval, mencetak kontrak PDF, dan mencatat pembayaran lewat POS.</p>
+                    <p class="mb-4 inline-flex rounded-full border border-amber-300/20 bg-amber-300/10 px-4 py-2 text-sm font-bold text-amber-200">Portal layanan laundry</p>
+                    <h1 class="text-5xl font-black leading-tight tracking-tight">Kelola pesanan, kontrak, dan pembayaran dengan aman.</h1>
+                    <p class="mt-5 text-lg leading-8 text-stone-300">Login untuk mengajukan pesanan laundry, mengelola approval, mencetak kontrak PDF, dan mencatat pembayaran lewat POS.</p>
                 </div>
                 <div class="relative z-10 grid grid-cols-3 gap-3">
                     <div class="rounded-2xl border border-white/10 bg-white/5 p-4"><p class="text-2xl font-black">PDF</p><p class="text-xs text-stone-400">Kontrak</p></div>

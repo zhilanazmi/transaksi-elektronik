@@ -32,7 +32,7 @@ class PosController extends Controller
         ]);
 
         $project = Project::with('customer')->findOrFail($data['project_id']);
-        abort_unless(in_array($project->status, ['waiting_payment', 'approved'], true), 422, 'Proyek belum di-ACC admin.');
+        abort_unless(in_array($project->status, ['waiting_payment', 'approved'], true), 422, 'Pesanan belum di-ACC admin.');
         abort_if($data['amount'] > $project->remainingAmount(), 422, 'Nominal melebihi sisa tagihan.');
 
         $payment = Payment::create([

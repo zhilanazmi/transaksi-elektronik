@@ -2,12 +2,12 @@
     <x-slot name="header">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <p class="text-sm font-black uppercase tracking-[0.3em] text-amber-400">Project Center</p>
-                <h2 class="mt-1 text-2xl font-black text-white sm:text-3xl">Proyek Saya</h2>
-                <p class="mt-1 text-sm text-stone-400">Kelola pengajuan, status validasi, dan pembayaran proyek.</p>
+                <p class="text-sm font-black uppercase tracking-[0.3em] text-amber-400">Order Center</p>
+                <h2 class="mt-1 text-2xl font-black text-white sm:text-3xl">Pesanan Saya</h2>
+                <p class="mt-1 text-sm text-stone-400">Kelola pengajuan, status validasi, dan pembayaran pesanan laundry.</p>
             </div>
             <a class="inline-flex justify-center rounded-2xl bg-amber-500 px-5 py-3 text-sm font-black text-stone-950 transition hover:-translate-y-0.5 hover:bg-amber-400" href="{{ route('projects.create') }}">
-                Ajukan Proyek
+                Ajukan Pesanan
             </a>
         </div>
     </x-slot>
@@ -25,7 +25,7 @@
                             <div class="min-w-0">
                                 <p class="text-xs font-black uppercase tracking-[0.22em] text-stone-500">{{ $project->project_code }}</p>
                                 <h3 class="mt-2 truncate text-xl font-black text-white">{{ $project->title }}</h3>
-                                <p class="mt-2 text-sm text-stone-400">{{ $project->construction_type }} - {{ $project->location }}</p>
+                                <p class="mt-2 text-sm text-stone-400">{{ $project->construction_type }} - {{ number_format((float) ($project->laundry_weight ?? 0), 1, ',', '.') }} kg</p>
                             </div>
                             <div class="flex flex-col gap-2 md:items-end">
                                 <p class="text-lg font-black text-white">Rp{{ number_format($project->budget, 0, ',', '.') }}</p>
@@ -37,8 +37,8 @@
                     </a>
                 @empty
                     <div class="p-10 text-center">
-                        <p class="text-lg font-black text-white">Belum ada pengajuan proyek.</p>
-                        <p class="mt-2 text-sm text-stone-400">Ajukan proyek pertama untuk memulai proses kontrak dan pembayaran.</p>
+                        <p class="text-lg font-black text-white">Belum ada pengajuan pesanan.</p>
+                        <p class="mt-2 text-sm text-stone-400">Ajukan pesanan laundry pertama untuk memulai proses kontrak dan pembayaran.</p>
                     </div>
                 @endforelse
             </div>

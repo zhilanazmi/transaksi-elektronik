@@ -18,7 +18,7 @@
                 <h3 class="text-xl font-black text-white">Transaksi Baru</h3>
 
                 <div>
-                    <x-input-label for="project_id" value="Proyek" />
+                    <x-input-label for="project_id" value="Pesanan" />
                     <select id="project_id" name="project_id" class="mt-2 block w-full rounded-2xl border-white/10 bg-stone-950 text-stone-200 focus:border-amber-500 focus:ring-amber-500">
                         @foreach($projects as $project)
                             <option value="{{ $project->id }}">{{ $project->project_code }} - {{ $project->customer->name }} - sisa Rp{{ number_format($project->remainingAmount(), 0, ',', '.') }}</option>
