@@ -191,10 +191,15 @@ Mencatat aktivitas penting (siapa melakukan apa) untuk keperluan audit transaksi
 
 4. **Persiapan Database**
    - Buat database manual di MySQL dengan nama `laundrypay`.
-   - Jalankan migrasi dan seeder:
+   - **Opsi A (Data Kosong)**: Jalankan migrasi dan seeder:
      ```bash
      php artisan key:generate
      php artisan migrate --seed
+     ```
+   - **Opsi B (Bulk Import Data Demo)**: Jika ingin menggunakan data lengkap (15+ Mitra & Kontrak) yang sudah saya siapkan, gunakan file `database_dump.sql`:
+     ```bash
+     mysql -u root laundrypay < database_dump.sql
+     php artisan key:generate
      ```
 
 5. **Build Asset Frontend**
