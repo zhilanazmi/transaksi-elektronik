@@ -201,6 +201,7 @@ Mencatat aktivitas penting (siapa melakukan apa) untuk keperluan audit transaksi
      mysql -u root laundrypay < database_dump.sql
      php artisan key:generate
      ```
+   - **Opsi C (Manual SQL Copy-Paste)**: Jika tidak bisa menggunakan command line, Anda bisa meng-copy isi dari file `data_seed_bulk.sql` dan menjalankannya di tab **SQL** pada PHPMyAdmin Anda.
 
 5. **Build Asset Frontend**
    ```bash
