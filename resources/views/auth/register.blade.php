@@ -15,6 +15,15 @@
         </div>
 
         <div class="mt-4">
+            <x-input-label for="role" value="Daftar Sebagai" />
+            <select id="role" name="role" class="mt-1 block w-full border-stone-300 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-300 focus:border-amber-500 dark:focus:border-amber-600 focus:ring-amber-500 dark:focus:ring-amber-600 rounded-md shadow-sm">
+                <option value="customer" {{ old('role') == 'customer' ? 'selected' : '' }}>Customer (Laundry)</option>
+                <option value="mitra" {{ old('role') == 'mitra' ? 'selected' : '' }}>Mitra (Partner)</option>
+            </select>
+            <x-input-error :messages="$errors->get('role')" class="mt-2" />
+        </div>
+
+        <div class="mt-4">
             <x-input-label for="email" value="Email" />
             <x-text-input id="email" class="mt-1 block w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />

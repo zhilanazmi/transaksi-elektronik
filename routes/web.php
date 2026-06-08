@@ -9,6 +9,9 @@ use App\Http\Controllers\PosController;
 use App\Http\Controllers\ProjectController;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\MitraApplicationController;
+use App\Http\Controllers\Admin\MitraApplicationController as AdminMitraController;
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -18,6 +21,23 @@ Route::post('/midtrans/notification', [PaymentController::class, 'notification']
     ->name('midtrans.notification');
 
 Route::middleware('auth')->group(function () {
+    // Mitra Routes
+    Route::middleware('can:is-mitra')->group(function () {
+        Route::get('/mitra/applications', [MitraApplicationController::class, 'index'])->name('mitra.applications.index');
+        Route::get('/mitra/applications/create', [MitraApplicationController::class, 'create'])->name('mitra.applications.create');
+        Route::post('/mitra/applications', [MitraApplicationController::class, 'store'])->name('mitra.applications.store');
+        Route::get('/mitra/applications/{application}', [MitraApplicationController::class, 'show'])->name('mitra.applications.show');
+    });
+
+    // Admin Mitra Routes
+    Route::middleware('can:is-admin')->group(function () {
+        Route::get('/admin/mitra', [AdminMitraController::class, 'index'])->name('admin.mitra.index');
+        Route::get('/admin/mitra/partners', [AdminMitraController::class, 'partners'])->name('admin.mitra.partners');
+        Route::get('/admin/mitra/{application}', [AdminMitraController::class, 'show'])->name('admin.mitra.show');
+        Route::patch('/admin/mitra/{application}/approve', [AdminMitraController::class, 'approve'])->name('admin.mitra.approve');
+        Route::patch('/admin/mitra/{application}/reject', [AdminMitraController::class, 'reject'])->name('admin.mitra.reject');
+    });
+
     Route::resource('projects', ProjectController::class);
     Route::get('/projects/{project}/payments/create', [PaymentController::class, 'create'])->name('payments.create');
     Route::post('/projects/{project}/payments', [PaymentController::class, 'store'])->name('payments.store');

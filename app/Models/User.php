@@ -32,6 +32,11 @@ class User extends Authenticatable
         return $this->hasMany(Project::class);
     }
 
+    public function mitraApplications()
+    {
+        return $this->hasMany(MitraApplication::class);
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
@@ -40,6 +45,11 @@ class User extends Authenticatable
     public function isStaff(): bool
     {
         return $this->role === 'staff';
+    }
+
+    public function isMitra(): bool
+    {
+        return $this->role === 'mitra';
     }
 
     /**

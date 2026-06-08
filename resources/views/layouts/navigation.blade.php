@@ -22,6 +22,17 @@
                         <x-nav-link :href="route('admin.projects.index')" :active="request()->routeIs('admin.projects.*')">
                             Approval
                         </x-nav-link>
+                        <x-nav-link :href="route('admin.mitra.index')" :active="request()->routeIs('admin.mitra.index')">
+                            Pengajuan Mitra
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin.mitra.partners')" :active="request()->routeIs('admin.mitra.partners')">
+                            Daftar Mitra
+                        </x-nav-link>
+                    @endif
+                    @if(Auth::user()->isMitra())
+                        <x-nav-link :href="route('mitra.applications.index')" :active="request()->routeIs('mitra.applications.*')">
+                            Pengajuan Mitra
+                        </x-nav-link>
                     @endif
                     @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
                         <x-nav-link :href="route('pos.index')" :active="request()->routeIs('pos.*')">
@@ -90,6 +101,17 @@
             @if(Auth::user()->isAdmin())
                 <x-responsive-nav-link :href="route('admin.projects.index')" :active="request()->routeIs('admin.projects.*')">
                     Approval
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.mitra.index')" :active="request()->routeIs('admin.mitra.index')">
+                    Pengajuan Mitra
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.mitra.partners')" :active="request()->routeIs('admin.mitra.partners')">
+                    Daftar Mitra
+                </x-responsive-nav-link>
+            @endif
+            @if(Auth::user()->isMitra())
+                <x-responsive-nav-link :href="route('mitra.applications.index')" :active="request()->routeIs('mitra.applications.*')">
+                    Pengajuan Mitra
                 </x-responsive-nav-link>
             @endif
             @if(Auth::user()->isAdmin() || Auth::user()->isStaff())

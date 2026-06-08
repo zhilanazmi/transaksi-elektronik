@@ -11,6 +11,7 @@ class Contract extends Model
 
     protected $fillable = [
         'project_id',
+        'mitra_application_id',
         'contract_number',
         'issued_at',
         'contract_value',
@@ -29,5 +30,10 @@ class Contract extends Model
     public function project()
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function mitraApplication()
+    {
+        return $this->belongsTo(MitraApplication::class);
     }
 }
