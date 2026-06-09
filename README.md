@@ -152,27 +152,60 @@ Mencatat aktivitas penting (siapa melakukan apa) untuk keperluan audit transaksi
 
 ---
 
-## 🐳 Docker Setup (Laravel Sail)
+## 🚀 Panduan Instalasi (Multi-Environment)
 
-Proyek ini telah dikontainerisasi menggunakan Docker untuk memastikan lingkungan yang konsisten dan aman.
+Pilih metode instalasi yang sesuai dengan lingkungan pengembangan Anda:
 
-### Langkah-langkah Menjalankan:
+### 1. 🐳 Lingkungan Docker (Laravel Sail) - *Rekomendasi Utama*
+Gunakan metode ini jika Anda ingin lingkungan yang instan dan terisolasi tanpa perlu menginstal PHP/MySQL secara lokal.
 
-1.  **Clone & Masuk ke Folder**
-2.  **Siapkan Variabel Lingkungan**
+1.  **Siapkan Variabel Lingkungan (PowerShell):**
     ```powershell
     $env:WWWGROUP="1000"; $env:WWWUSER="1000"
     ```
-3.  **Jalankan Docker Compose**
+2.  **Nyalakan Kontainer:**
     ```bash
     docker-compose up -d --build
     ```
-4.  **Inisialisasi Database**
+3.  **Inisialisasi Aplikasi:**
     ```bash
     docker-compose exec laravel.test php artisan migrate:fresh --seed
     docker-compose exec laravel.test php artisan db:seed --class=MitraContractSeeder
     ```
-5.  **Akses Aplikasi**: [http://localhost](http://localhost)
+4.  **Akses**: [http://localhost](http://localhost)
+
+---
+
+### 2. 💻 Lingkungan Localhost (Laragon / XAMPP)
+Gunakan metode ini jika Anda lebih nyaman menggunakan server lokal tradisional.
+
+1.  **Siapkan Database**: Buat database baru bernama `laundrypay` di MySQL.
+2.  **Konfigurasi .env**: Salin `.env.example` menjadi `.env` dan sesuaikan `DB_HOST=127.0.0.1`, `DB_USERNAME`, dan `DB_PASSWORD`.
+3.  **Instal Dependensi**:
+    ```bash
+    composer install
+    npm install && npm run build
+    ```
+4.  **Inisialisasi Database**:
+    ```bash
+    php artisan key:generate
+    php artisan migrate --seed
+    php artisan db:seed --class=MitraContractSeeder
+    ```
+5.  **Jalankan Server**: `php artisan serve`
+6.  **Akses**: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+
+---
+
+### 3. 🖥️ Lingkungan VM (VMWare) / VPS (Linux)
+Gunakan metode ini untuk simulasi deployment server nyata.
+
+1.  **Server Requirements**: Pastikan server memiliki PHP 8.2+, MySQL, dan Nginx/Apache.
+2.  **Deployment**:
+    *   Clone repository ke folder `/var/www/html`.
+    *   Berikan izin akses folder: `chmod -R 775 storage bootstrap/cache`.
+3.  **Setup SSL & Domain**: Sangat disarankan menggunakan HTTPS (Certbot) untuk menguji fitur Keamanan Gateway Pembayaran.
+4.  **Setup Database**: Sama dengan langkah Localhost, namun pastikan `APP_ENV=production` dan `APP_DEBUG=false` di file `.env`.
 
 ---
 
