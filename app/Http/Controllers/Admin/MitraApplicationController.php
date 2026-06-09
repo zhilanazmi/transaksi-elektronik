@@ -47,6 +47,46 @@ class MitraApplicationController extends Controller
         return redirect()->route('admin.mitra.index')->with('success', 'Pengajuan mitra disetujui dan kontrak telah dibuat.');
     }
 
+    public function uploadContract(Request $request, User $mitra)
+    {
+        $this->authorizeAdmin();
+        
+        $request->validate([
+            'contract_pdf' => 'required|file|mimes:pdf|max:5120', // Hanya PDF, max 5MB
+        ], [
+            'contract_pdf.mimes' => 'Hanya file PDF yang diperbolehkan!',
+        ]);
+
+        $path = $request->file('contract_pdf')->store('contracts', 'public');
+
+        // Cari atau buat pengajuan mitra dummy jika admin upload manual tanpa pengajuan
+        $application = $mitra->mitraApplications()->where('status', 'approved')->first();
+        
+        if (!$application) {
+            $application = $mitra->mitraApplications()->create([
+                'nama_mitra' => $mitra->name,
+                'jenis_mitra' => 'supplier',
+                'produk_mitra' => 'Manual Upload',
+                'durasi_mitra' => '12 Bulan',
+                'kewajiban_mitra' => 'Sesuai dokumen terlampir',
+                'kewajiban_pemilik' => 'Sesuai dokumen terlampir',
+                'status' => 'approved',
+                'approved_at' => now(),
+            ]);
+        }
+
+        $application->contract()->create([
+            'contract_number' => 'CTR-MANUAL-'.now()->format('YmdHis'),
+            'issued_at' => now()->toDateString(),
+            'contract_value' => 0,
+            'status' => 'active',
+            'content' => 'Kontrak diunggah manual oleh Admin.',
+            'pdf_path' => $path,
+        ]);
+
+        return back()->with('success', 'Kontrak PDF berhasil diunggah.');
+    }
+
     public function reject(Request $request, MitraApplication $application)
     {
         $this->authorizeAdmin();

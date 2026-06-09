@@ -21,7 +21,7 @@ class MitraApplicationController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'nama_mitra' => 'required|string|max:255',
             'jenis_mitra' => 'required|in:supplier,distributor',
             'produk_mitra' => 'required|string|max:255',
@@ -30,7 +30,11 @@ class MitraApplicationController extends Controller
             'kewajiban_pemilik' => 'required|string',
         ]);
 
-        Auth::user()->mitraApplications()->create($request->all());
+        // Proteksi XSS: Sanitasi input
+        $data['kewajiban_mitra'] = strip_tags($data['kewajiban_mitra']);
+        $data['kewajiban_pemilik'] = strip_tags($data['kewajiban_pemilik']);
+
+        Auth::user()->mitraApplications()->create($data);
 
         return redirect()->route('mitra.applications.index')->with('success', 'Pengajuan mitra berhasil dikirim.');
     }

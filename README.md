@@ -152,67 +152,48 @@ Mencatat aktivitas penting (siapa melakukan apa) untuk keperluan audit transaksi
 
 ---
 
-## ⚙️ Panduan Instalasi (Running the Project)
+## 🐳 Docker Setup (Laravel Sail)
 
-### Prasyarat
-- PHP >= 8.2
-- Composer
-- Node.js & NPM
-- Laragon atau XAMPP (dengan MySQL aktif)
+Proyek ini telah dikontainerisasi menggunakan Docker untuk memastikan lingkungan yang konsisten dan aman.
 
-### Langkah-langkah Setup:
+### Langkah-langkah Menjalankan:
 
-1. **Clone Repository**
-   ```bash
-   git clone https://github.com/zhilanazmi/transaksi-elektronik.git
-   cd transaksi-elektronik
-   ```
+1.  **Clone & Masuk ke Folder**
+2.  **Siapkan Variabel Lingkungan**
+    ```powershell
+    $env:WWWGROUP="1000"; $env:WWWUSER="1000"
+    ```
+3.  **Jalankan Docker Compose**
+    ```bash
+    docker-compose up -d --build
+    ```
+4.  **Inisialisasi Database**
+    ```bash
+    docker-compose exec laravel.test php artisan migrate:fresh --seed
+    docker-compose exec laravel.test php artisan db:seed --class=MitraContractSeeder
+    ```
+5.  **Akses Aplikasi**: [http://localhost](http://localhost)
 
-2. **Install Dependensi**
-   ```bash
-   composer install
-   npm install
-   ```
+---
 
-3. **Konfigurasi Environment**
-   - Salin `.env.example` menjadi `.env`:
-     ```bash
-     cp .env.example .env
-     ```
-   - Sesuaikan database di `.env`:
-     ```env
-     DB_CONNECTION=mysql
-     DB_HOST=127.0.0.1
-     DB_PORT=3306
-     DB_DATABASE=laundrypay
-     DB_USERNAME=root
-     DB_PASSWORD=
-     ```
+## 🛡️ Keamanan & Hardening (Bug Bounty Ready)
 
-4. **Persiapan Database**
-   - Buat database manual di MySQL dengan nama `laundrypay`.
-   - **Opsi A (Data Kosong)**: Jalankan migrasi dan seeder:
-     ```bash
-     php artisan key:generate
-     php artisan migrate --seed
-     ```
-   - **Opsi B (Bulk Import Data Demo)**: Jika ingin menggunakan data lengkap (15+ Mitra & Kontrak) yang sudah saya siapkan, gunakan file `database_dump.sql`:
-     ```bash
-     mysql -u root laundrypay < database_dump.sql
-     php artisan key:generate
-     ```
-   - **Opsi C (Manual SQL Copy-Paste)**: Jika tidak bisa menggunakan command line, Anda bisa meng-copy isi dari file `data_seed_bulk.sql` dan menjalankannya di tab **SQL** pada PHPMyAdmin Anda.
+Aplikasi ini telah diperkuat (hardened) untuk melewati 9 skenario Penetration Testing utama:
 
-5. **Build Asset Frontend**
-   ```bash
-   npm run build
-   ```
+1.  **Anti-Payment Spoofing**: Validasi Signature Key (HMAC-SHA512) pada setiap notifikasi Midtrans.
+2.  **Business Logic Security**: Penguncian dokumen legal (kontrak) berdasarkan status transaksi.
+3.  **IDOR Protection**: Validasi kepemilikan data (Ownership Check) di tingkat Controller.
+4.  **Anti-Phishing & Content Spoofing**: Pembersihan tag HTML (`strip_tags`) pada seluruh input publik.
+5.  **API & Route Security**: Proteksi seluruh endpoint menggunakan middleware otentikasi.
+6.  **Strict Session Management**: Penghancuran sesi secara permanen saat logout (Anti-Session Replay).
+7.  **Injection Protection**: Penggunaan Eloquent ORM (Anti-SQLi) dan Blade Escaping (Anti-XSS).
+8.  **Secure File Upload**: Validasi Mime-Type ketat (PDF Only) untuk fitur unggah kontrak admin.
+9.  **Data At Rest Security**: Hashing password menggunakan algoritma Bcrypt.
 
-6. **Jalankan Server**
-   ```bash
-   php artisan serve
-   ```
-   Akses di: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+---
+
+## 📁 15 Data Kontrak Mitra (DK01 - DK15)
+Sistem telah dilengkapi dengan data 15 mitra (Supplier & Distributor) beserta kontrak legal yang terafiliasi secara otomatis, diatur dengan strategi isolasi data yang ketat.
 
 ---
 

@@ -34,6 +34,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/mitra', [AdminMitraController::class, 'index'])->name('admin.mitra.index');
         Route::get('/admin/mitra/partners', [AdminMitraController::class, 'partners'])->name('admin.mitra.partners');
         Route::get('/admin/mitra/{application}', [AdminMitraController::class, 'show'])->name('admin.mitra.show');
+        Route::post('/admin/mitra/{mitra}/upload-contract', [AdminMitraController::class, 'uploadContract'])->name('admin.mitra.upload_contract');
         Route::patch('/admin/mitra/{application}/approve', [AdminMitraController::class, 'approve'])->name('admin.mitra.approve');
         Route::patch('/admin/mitra/{application}/reject', [AdminMitraController::class, 'reject'])->name('admin.mitra.reject');
     });

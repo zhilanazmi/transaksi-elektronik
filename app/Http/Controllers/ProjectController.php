@@ -45,6 +45,11 @@ class ProjectController extends Controller
             'description' => ['required', 'string', 'min:20'],
         ]);
 
+        // Proteksi XSS
+        $data['title'] = strip_tags($data['title']);
+        $data['location'] = strip_tags($data['location']);
+        $data['description'] = strip_tags($data['description']);
+
         $data['service_price'] = self::SERVICE_PRICES[$data['construction_type']];
         $data['budget'] = $this->calculateLaundryTotal((float) $data['laundry_weight'], $data['service_price']);
 
@@ -66,7 +71,16 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
-        abort_if($project->user_id !== request()->user()->id && ! request()->user()->isAdmin() && ! request()->user()->isStaff(), 403);
+        if ($project->user_id !== request()->user()->id && ! request()->user()->isAdmin() && ! request()->user()->isStaff()) {
+            AuditLog::create([
+                'user_id' => request()->user()->id,
+                'action' => 'unauthorized_project_access',
+                'subject_type' => Project::class,
+                'subject_id' => $project->id,
+                'properties' => ['ip' => request()->ip()]
+            ]);
+            abort(403, 'Akses Ilegal Terdeteksi!');
+        }
 
         PaymentController::syncProjectMidtransPayments($project);
         $project->load(['customer', 'approver', 'contract', 'payments.posTransaction']);
