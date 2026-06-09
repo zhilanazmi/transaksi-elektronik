@@ -1,4 +1,0 @@
-[05:57, 6/7/2026] Pak Asep: Tips untuk dapat nilai baik : no 1. Min 3 lapis keamanan. No 2. Jelaskan bagaimana  Lingkungan tes dibuat. Tools yg dipakai ,proses yang dilakukan ,usulan perbaikan .no 3. Konsep dan tujuan Bug Bounty , Jelaskan bagaimana  Lingkungan tes dibuat. Tools yg dipakai ,proses yang dilakukan ,usulan perbaikan dan reporting
-[06:01, 6/7/2026] Pak Asep: Tips untuk dapat nilai baik : no 1. Min 3 lapis keamanan. No 2. Jelaskan bagaimana  Lingkungan tes dibuat. Tools yg dipakai ,proses yang dilakukan ,usulan perbaikan .no 3. Konsep dan tujuan Bug Bounty , Jelaskan bagaimana  Lingkungan tes dibuat. Tools yg dipakai ,proses yang dilakukan ,usulan perbaikan dan reporting
-[17:48, 6/7/2026] Pak Asep: seluruh anggota mengerjakan dimasing masing laptop boleh berbeda environmennya contoh satu pake VMWare. Satu lagi pake docker
-[17:50, 6/7/2026] Pak Asep: Mudah2an mendapatkan pengalaman yg beragam dan bermanfaat.  DEADLINE SELASA J23.59 SELAMAT MENGERJAKAN
